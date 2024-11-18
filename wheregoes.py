@@ -9,7 +9,7 @@ proxies = {
 }
 
 starting_number = 20241111111
-total_requests = 8888888  # Define how many URLs you want to process
+total_requests = 8888888
 max_threads = 20  # Number of concurrent threads
 
 def grab_url(number):
