@@ -1,0 +1,1 @@
+- Utilizes TOR to scrape every URL entered into Wheregoes.com for 2024.
