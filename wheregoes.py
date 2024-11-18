@@ -25,7 +25,7 @@ def grab_url(number):
                 print(f"URL: {url} - %d Extracted Final URL: {final_url}")
                 return number, final_url
             else:
-                print(f"URL: {url} - No URL textarea found in the trace.")
+                print(f"URL: {url} - Error - textarea not found in the trace.")
                 return number, None
         else:
             print(f"URL: {url} - Status Code: {response.status_code}")
