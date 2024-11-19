@@ -1,4 +1,4 @@
-# Wheregoes Scraper
+# WhereGoes Scraper
 
 A Python-based scraper that leverages TOR to extract and process URLs from Wheregoes.com for the year 2024.
 Features
