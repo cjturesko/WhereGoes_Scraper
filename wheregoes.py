@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import time
 
 proxies = {
     "http://": "socks5://127.0.0.1:9050",
@@ -10,7 +9,11 @@ proxies = {
 
 starting_number = 20241111111
 total_requests = 8888888
-max_threads = 20  # Number of concurrent threads
+max_threads = 10
+max_failures = 10  # Every result should be within 10
+failure_count = 0  # Tracks consecutive failures
+current_number = starting_number
+
 
 def grab_url(number):
     url = f"https://wheregoes.com/trace/{number}"
@@ -22,7 +25,7 @@ def grab_url(number):
             if url_textarea:
                 obfuscated_url = url_textarea.get_text()
                 final_url = obfuscated_url.replace('|', '')
-                print(f"URL: {url} - %d Extracted Final URL: {final_url}")
+                print(f"URL: {url} - Extracted Final URL: {final_url}")
                 return number, final_url
             else:
                 print(f"URL: {url} - Error - textarea not found in the trace.")
@@ -37,12 +40,30 @@ def grab_url(number):
         print(f"Error with request to {url}: {e}")
         return number, None
 
-with open("wheregoesURLs.txt", "a") as file:
-    with ThreadPoolExecutor(max_workers=max_threads) as executor:
-        
-        futures = [executor.submit(grab_url, starting_number + i) for i in range(total_requests)]
-        
-        for future in as_completed(futures):
-            number, final_url = future.result()
-            if final_url:
-                file.write(f"{number} | {final_url}\n")
+
+while True:
+    with open("wheregoesURLs.txt", "a") as file:
+        with ThreadPoolExecutor(max_workers=max_threads) as executor:
+            futures = [executor.submit(grab_url, current_number + i) for i in range(max_threads)]
+
+            for future in as_completed(futures):
+                number, final_url = future.result()
+                if final_url:
+                    file.write(f"{number} | {final_url}\n")
+                    failure_count = 0  # Reset failures so it'll increase the minimum number
+                else:
+                    failure_count += 1  # Increment failures if the result 404s
+                    print(f"Fail Count: {failure_count}/10")
+
+                # Test if you're at the front of results
+                #   if so then jump back 10 & recheck since it'll grab the latest
+                if failure_count >= max_failures:
+                    print("Too many failures. Rechecking earlier numbers...\n")
+                    current_number = max(starting_number, current_number - max_failures)
+                    failure_count = 0
+                    break
+
+    # Increment the starting number for the next batch
+    current_number += max_threads
+
+    
