@@ -5,4 +5,4 @@ A Python-based scraper that leverages TOR to extract and process URLs from Where
 
     - Uses the TOR network to scrape URLs.
     - Automated URL Extraction
-    - Once all are scraped it'll restart to find the latest links.
+    - Once all old URLs are scraped it'll continuously retry to find the latest links as soon as they're entered.
